@@ -46,7 +46,7 @@ description: Publish validated and preview-confirmed Zhihu content as pin, artic
 
 | 类型 | 无需交互确认、以 validate 为准 | 发布阶段交互确认后确定 |
 |---|---|---|
-| `pin` | `type`、`title`、`body`、`media` / `images`、`linkCard` | `comment_permission`、`ring` |
+| `pin` | `type`、`title`、`body`、`media` / `images`、`linkCard` | `comment_permission`、`ring`、`creation_statement`（仅 `ai_creation`） |
 | `article` | `type`、`title`、`body` | `comment_permission`、`topics`、`creation_statement`、`table_of_contents_enabled` |
 | `question` | `type`、`title`、`body` | `topics` |
 
@@ -87,7 +87,7 @@ description: Publish validated and preview-confirmed Zhihu content as pin, artic
 
 | `latest.type` | 必读规范 | 说明 |
 |---|---|---|
-| `pin` | `reference/publish-pin.md` | 想法发布，处理正文、独立图片、链接卡片、圈子和评论权限 |
+| `pin` | `reference/publish-pin.md` | 想法发布，处理正文、独立图片、链接卡片、圈子、评论权限和 AI 创作声明 |
 | `article` | `reference/publish-article.md` | 文章发布，处理标题、正文、话题、目录和创作声明 |
 | `question` | `reference/publish-question.md` | 问题发布，处理问题标题、问题说明和可选话题 |
 

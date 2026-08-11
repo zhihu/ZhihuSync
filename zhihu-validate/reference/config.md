@@ -31,7 +31,7 @@
 - `config`：正文之外的发布配置集合，不属于正文 HTML；不同内容形态只输出其支持的配置项，不需要为不支持的配置项补空值。
 - `config.topics`：文章和提问的话题配置列表，只能包含已存在且可发布的话题；想法的话题属于正文表达，不写入 `config.topics`。
 - `config.tableOfContentsEnabled`：文章目录开关，仅文章需要考虑。
-- `config.creationStatement`：文章创作声明配置；无声明时使用默认「无声明」配置。
+- `config.creationStatement`：文章或想法创作声明配置；想法仅支持 AI 辅助创作声明，无声明时使用默认「无声明」配置。
 - `config.commentPermission`：评论权限；默认 `all`。
 - `config.ring`：圈子配置，主要用于想法；不使用时为 `null`。
 
@@ -134,21 +134,20 @@
 | ---- | -------- | ---- |
 | 文章 | **支持** | 必须按可选枚举设置；默认「无声明」 |
 | 提问 | 不支持 | 不要生成创作声明配置 |
-| 想法 | 不支持 | 不要生成创作声明配置 |
+| 想法 | **支持** | 仅支持 AI 辅助创作声明；默认「无声明」 |
 
 ### 4.1 枚举值（展示文案）
 
-| 展示文案 | 说明 |
-| -------- | ---- |
-| 包含剧透 | |
-| 包含医疗建议 | |
-| 虚构创作 | |
-| 包含理财内容 | |
-| 包含 AI 辅助创作 | |
-| 作者对内容负责 | |
-| 无声明 | **默认值** |
+| 展示文案 | 文章 | 想法 |
+| -------- | ---- | ---- |
+| 包含剧透 | 支持 | 不支持 |
+| 包含医疗建议 | 支持 | 不支持 |
+| 虚构创作 | 支持 | 不支持 |
+| 包含理财内容 | 支持 | 不支持 |
+| 包含 AI 辅助创作，作者对内容负责 | 支持 | **支持，唯一可用声明** |
+| 无声明 | **默认值** | **默认值** |
 
-> `disclaimer_type` 的具体取值以可用创作声明选项中的 `type` 字段为准；上表为展示文案枚举，选择后映射为对应 `type`。
+> 文章的 `disclaimer_type` 具体取值以可用创作声明选项中的 `type` 字段为准。想法选择 AI 辅助创作时固定使用 `ai_creation`，不得使用文章支持的其他声明类型。
 
 ### 4.2 配置结构
 
@@ -176,7 +175,7 @@
 {
   "config": {
     "creationStatement": {
-      "disclaimer_type": "<对应「包含 AI 辅助创作」的 type>",
+      "disclaimer_type": "ai_creation",
       "disclaimer_status": "open"
     }
   }
@@ -274,7 +273,7 @@
 | ------ | ---- | ---- | ---- |
 | `topics` | 最多 5，仅使用已有话题，不创建 | 最多 3，仅使用已有话题，不创建 | 不配置；只将用户明确提供或确认的话题写入正文，发布时检查并按需创建；没有时不生成 |
 | `tableOfContentsEnabled` | — | 支持 | — |
-| `creationStatement` | — | 支持 | — |
+| `creationStatement` | — | 支持全部文章声明 | 仅支持 `ai_creation` |
 | `commentPermission` | — | 固定 `all` | 支持，默认 `all` |
 | `ring` | — | — | 支持，最多 1 个 |
 
@@ -338,6 +337,10 @@
   "linkCard": null,
   "config": {
     "commentPermission": "all",
+    "creationStatement": {
+      "disclaimer_type": "ai_creation",
+      "disclaimer_status": "open"
+    },
     "ring": null
   }
 }

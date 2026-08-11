@@ -22,20 +22,21 @@
 | `content.linkcard` | `latest.linkCard` | 可选；仅在无独立图片时发送 |
 | `content.images` | `latest.media` 或 `latest.images` | 可选；仅独立图片；仅在无独立链接卡片时发送 |
 
-不要从 validate 结果中提取或继承想法发布配置。即使 `latest.config` 中存在评论权限或圈子，也必须在发布前重新和用户确认。
+不要从 validate 结果中提取或继承想法发布配置。即使 `latest.config` 中存在评论权限、圈子或创作声明，也必须在发布前重新和用户确认。
 
-想法话题属于正文表达，已经在 `latest.body` 中，不发送 `topics`。不要发送 `creation_statement` 或 `table_of_contents_enabled`。
+想法话题属于正文表达，已经在 `latest.body` 中，不发送 `topics`。想法只支持 AI 创作声明 `ai_creation`，不支持文章的其他创作声明；不要发送 `table_of_contents_enabled`。
 
 ## 发布前交互确认
 
 组装请求前，必须向用户确认以下发布参数。用户直接接受默认值时，可以继续发布。
 
-确认时必须把评论权限可选项展示给用户，不能只问“请选择评论权限”。展示时只展示中文描述，不展示内部参数值。
+确认时必须把评论权限和创作声明的可选项展示给用户，不能只问“请选择评论权限/创作声明”。展示时只展示中文描述，不展示内部参数值。
 
 | 参数 | 默认值 | 处理规则 |
 |---|---|---|
 | 评论权限 | 所有人可评论 | 用户未指定时内部发送 `all` |
 | 圈子 `ring` | 不设置 | 用户需要发布到圈子时，要求用户粘贴知乎圈子链接；询问时必须给出示例 `https://www.zhihu.com/ring/host/1871220824524066816`；未提供时不发送 `ring` |
+| 创作声明 `creation_statement` | 没有声明 | 仅支持 AI 辅助创作；只有用户明确选择时才发送 `ai_creation` |
 
 ## Request Body
 
@@ -108,6 +109,14 @@
 }
 ```
 
+如果用户明确选择 AI 辅助创作声明，再在 `content` 中追加：
+
+```json
+{
+  "creation_statement": "ai_creation"
+}
+```
+
 ## 字段映射
 
 | Request 字段 | 来源 | 规则 |
@@ -121,6 +130,7 @@
 | `content.images` | validate 独立图片 | 可选；仅在无独立链接卡片时发送 |
 | `content.linkcard` | `latest.linkCard` | 可选；仅在无独立图片时发送 |
 | `content.ring` | 用户发布前粘贴的圈子链接 | 可选；未提供时不发送 |
+| `content.creation_statement` | 用户发布前确认 | 可选；仅允许 `ai_creation`，未明确选择时不发送 |
 
 ## 评论权限
 
@@ -135,6 +145,19 @@
 | 关注我 3 天以上的人可评论 | `follower_n_days` |
 
 如果用户选择或输入的评论权限无法匹配上表任一中文描述，停止发布并要求用户重新选择；不要静默替换为默认值，也不要要求用户输入内部值。
+
+## creation_statement
+
+发布前询问用户是否声明包含 AI 辅助创作。想法只支持以下两项，不能展示或发送文章支持的剧透、医疗建议、虚构创作或理财内容等其他创作声明：
+
+| 用户可见选项 | 发送规则 |
+|---|---|
+| 没有声明（默认） | 不发送 `creation_statement` |
+| 包含 AI 辅助创作，作者对内容负责 | 发送 `creation_statement: "ai_creation"` |
+
+如果用户选择没有声明，不要发送 `creation_statement`，也不要发送空字符串。用户要求使用其他声明时，停止发布并说明想法当前只支持 AI 辅助创作声明；不得替换为 `ai_creation` 或静默忽略。
+
+本次内容由 AI 生成或有 AI 辅助参与时（包括模型代写、扩写、改写或成段润色），必须主动推荐 AI 辅助创作声明，并说明不声明可能影响后续 AI 识别与内容分发。推荐后是否声明仍由用户决定：用户未明确选择时不得发送该字段，也不得默认代选。
 
 ## images
 
@@ -216,6 +239,7 @@ https://www.zhihu.com/ring/host/1871220824524066816
     "title": "HTTP publish pin test",
     "html": "<p>This is a pin published through publish OpenAPI.</p>",
     "comment_permission": "all",
+    "creation_statement": "ai_creation",
     "images": [
       {
         "url": "https://pic-private.zhihu.com/v2-watermark~resize:1440:q75.png?..."
