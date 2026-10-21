@@ -94,7 +94,7 @@ HTTP 状态码只表示 HTTP 请求是否到达服务并得到响应，不表示
 }
 ```
 
-鉴权失败可能返回 HTTP 401；发布频率超限可能返回 HTTP 429，body 中 `msg` 为 `rate limit exceeded`。当前 `zhihu-publisher` skill 每人每天最多发布 50 次。
+鉴权失败可能返回 HTTP 401；发布频率超限可能返回 HTTP 429，body 中 `msg` 为 `rate limit exceeded`。当前 `zhihu-sync` / 知乎同步助手每人每天最多发布 50 次。
 
 发布结果判定规则：
 

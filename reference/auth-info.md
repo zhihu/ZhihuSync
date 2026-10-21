@@ -76,6 +76,8 @@ ZHIHU_OPENAPI_APP_SECRET
 
 ## 如何获取
 
+知乎同步助手采用定向开放授权，面向持续产出优质内容、社区表现良好的创作者，并结合后续内容质量与社区规范执行情况持续评估使用权限，不向所有账号直接开放，也不承诺永久授权。完整介绍见 [README.md](../README.md)。
+
 ### ZHIHU_OPENAPI_APP_KEY（知乎用户 Token）
 
 登录知乎后访问个人主页，URL 中的用户名即为 Token：
@@ -87,6 +89,8 @@ https://www.zhihu.com/people/<这里就是 ZHIHU_OPENAPI_APP_KEY>
 ### ZHIHU_OPENAPI_APP_SECRET（开放平台访问密钥）
 
 前往知乎开放平台申请：
+
+知乎同步助手当前文档使用的外部申请地址仍如下；路径中的旧名称是外部入口标识。
 
 👉 **https://www.zhihu.com/playground/zhihu-publisher**
 

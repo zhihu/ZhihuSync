@@ -1,39 +1,59 @@
 ---
-name: zhihu-publisher
+name: zhihu-sync
 description: >-
-  Orchestrate Zhihu content publishing by running draft capture, image upload,
-  validate, preview, user confirmation, and publish stages in order. Only images
-  may be uploaded; video upload is not supported. Use when
-  the user asks to publish content to Zhihu, convert or adapt content for Zhihu,
-  generate a Zhihu preview, validate Zhihu-ready content, continue after preview
-  confirmation, handle Zhihu article/question/pin publishing workflows, or asks
-  what zhihu-publisher is, how to use it, first-time setup, authorization,
-  credentials, zhihu OpenAPI app_key/app_secret configuration, skill version, or
-  update availability.
-  Trigger on requests such as 发布到知乎, 发成知乎文章, 发成想法, 发起提问, 生成知乎预览,
-  校验知乎发布内容, 预览没问题, 确认发布, zhihu-publisher 是什么, 怎么用,
-  首次使用, 授权, 配置凭证, app_key, 检查更新, 检查版本, 更新
-  zhihu-publisher, 升级 zhihu-publisher.
+  Zhihu Sync / 知乎同步助手 adapts content for Zhihu through draft, image upload,
+  validation, preview, confirmation, and publishing for articles, questions, and pins.
+  Only images may be uploaded; video upload is not supported.
+  Use when the user asks to
+  sync or publish existing content to Zhihu, convert or adapt content for
+  Zhihu, generate a preview, validate Zhihu-ready content, continue after
+  preview confirmation, or handle article/question/pin publishing workflows.
+  Also use for questions about zhihu-sync, 知乎同步助手, its purpose, usage,
+  first-time setup, targeted authorization, credentials, Zhihu OpenAPI
+  app_key/app_secret configuration, publishing-source labels, the relationship
+  to AI-assisted creation, skill version, or update availability.
+  Trigger on 同步到知乎, 发布到知乎, 发成知乎文章, 发成想法, 发起提问,
+  生成知乎预览, 校验知乎发布内容, 预览没问题, 确认发布, zhihu-sync 是什么,
+  知乎同步助手怎么用, 首次使用, 授权, 配置凭证, app_key, 发布来源标记,
+  AI 辅助创作声明, 检查更新, 检查版本, 更新 zhihu-sync, 升级 zhihu-sync.
+  Recognize zhihu-publisher only as the former name for compatible requests.
 license: MIT
 metadata:
   author: zhihu
-  version: "0.1.11"
+  version: "0.1.12"
 ---
 
-# Zhihu Publisher
+# zhihu-sync / 知乎同步助手
 
-知乎发布流程的总编排入口。具体转换、预览和发布规则由子 skill 负责；本文件只规定执行顺序、阶段边界和关键产物路径。
+知乎同步助手，已有内容进入知乎的格式适配、预览与确认后发布总编排入口。具体转换、预览和发布规则由子 skill 负责；本文件只规定执行顺序、阶段边界和关键产物路径。
 
 ## 介绍
 
-当用户询问 `zhihu-publisher` 是什么、怎么用、首次使用、授权或凭证配置时：
+当用户询问 `zhihu-sync`、知乎同步助手（旧称 `zhihu-publisher`）是什么、怎么用、首次使用、核心目标与服务场景、授权政策、凭证配置方式、发布来源标记含义、与 AI 创作的关系或各内容形态的格式限制时：
 
-- 先读取 `README.md`，基于其中内容向用户介绍本 skill 的能力、安装方式、授权说明, 使用方式、发布链路和本地产物。
-- 只做介绍、首次使用说明和授权引导，不继续生成 draft、validate、preview 或 publish。
+- 先读取 `README.md`，基于其中内容向用户介绍本 skill 的能力、安装方式、授权说明、使用方式、发布链路和本地产物，并按问题解释定向授权、后续来源标记及其与 AI 辅助创作声明的区别。
+- 纯介绍或政策问答只做说明和授权引导，然后停止；不初始化或写入凭证，不安装上传依赖，不生成 draft、validate、preview 或 publish，不打开预览，不上传或发布。
+- 会话首次的旧版本卸载提醒、新版本检查及版本提示仍按下文“会话首次检查”执行；凭证配置、依赖安装或是否更新都不是回答介绍的前置条件，询问介绍不代表确认更新或发布。
+- 用户明确要求配置、保存凭证或直接提供凭证时，仍读取 `reference/auth-info.md` 按其初始化流程处理，不把实际配置请求当作纯政策问答。
 
-## 会话首次版本检查
+## 会话首次检查
 
-每个会话首次加载本 skill 后，或当用户询问 `zhihu-publisher` 是否有新版本、要求检查更新、检查版本、更新或升级时：
+每个会话首次加载本 skill 时，依次执行以下两项只读检查：旧版本卸载检查针对旧名称 `zhihu-publisher`，新版本检查更新针对当前 `zhihu-sync` 的版本号。分别记录两项检查状态，同一会话各自动检查一次；纯介绍、版本查询和无素材请求也执行。需要上传或随内容发布的视频请求仍按工作流程的规则停止，不访问版本接口。
+
+### 旧版本卸载
+
+检查旧名称 skill 是否仍可被当前 Agent 加载，发现共存时提醒用户卸载。同一会话不重复提醒，用户明确要求重新检查时除外。
+
+- 先检查当前 Agent 提供的可用 skill 清单，按 skill 的 `name` 精确查找 `zhihu-publisher`。
+- 清单未提供或不能确认是否完整时，只在当前 Agent 实际使用的 skill 加载目录中检查全局和当前项目安装（包括共享目录及符号链接），读取候选 `SKILL.md` 的 frontmatter，确认 `name` 是否为 `zhihu-publisher`。优先使用宿主提供的安装路径或配置，不全盘扫描，也不仅凭文件夹名称判断。
+- 仓库地址、授权 URL、日志前缀或开发仓库目录中出现 `zhihu-publisher`，不代表安装了旧 skill；`name: zhihu-sync` 的文件即使放在旧名称目录中，也不算旧 skill。
+- 发现旧 skill 时，提醒：`zhihu-publisher 已更名为 zhihu-sync。检测到旧 skill 仍可被当前 Agent 加载，建议删除 zhihu-publisher，仅保留 zhihu-sync，避免重复触发或使用旧流程。删除后请完全退出并重启 Agent。` 已知旧 skill 安装路径时一并列出；只有清单证据时说明名称，不猜测路径。
+- 只提醒用户删除旧 skill，不自动卸载或删除文件，不删除共享凭证或发布产物，不把用户完成清理作为当前请求的前置条件。用户暂未清理时，当前任务仍按已加载的 `zhihu-sync` 执行。
+- 检查能力或权限不足时，简要说明无法确认是否存在旧 skill，建议用户在当前 Agent 的 skill 管理界面或安装目录中检查；不要把未能检查当作不存在。
+
+### 新版本检查更新
+
+每个会话首次加载本 skill 后，或当用户询问 `zhihu-sync` / 知乎同步助手（兼容旧称）是否有新版本、要求检查更新、检查版本、更新或升级时：
 
 - 立即读取 `reference/update.md`，按其中流程访问版本接口，并将同名 skill 的接口版本与本地 `SKILL.md` 中的 `metadata.version` 比较。
 - 每个会话只自动检查一次；同一会话内只有用户再次明确询问更新、版本、升级，或遇到明显像旧版本导致的问题时，才重复检查。
@@ -54,7 +74,7 @@ metadata:
 
 完成下文工作流程第 0 步的无素材请求分流后，在确认内容形态、整理 draft、上传媒体或发布前，先完成以下检查：
 
-0. 如果本会话首次加载本 skill 后尚未完成版本检查，先执行上文“会话首次版本检查”。自动检查失败时简要说明原因并继续后续启动检查；自动检查发现新版本时，先等待用户选择更新或暂不更新。用户明确询问版本或更新时，完成版本检查后停止，不做凭证、依赖或发布流程检查。
+0. 如果本会话尚有首次检查未执行，先按上文“会话首次检查”补齐旧版本卸载检查和新版本检查更新，不重复已执行的检查。旧版本卸载只作提醒，不阻塞当前请求。自动检查失败时简要说明原因并继续后续启动检查；自动检查发现新版本时，先等待用户选择更新或暂不更新。用户明确询问版本或更新时，完成版本检查后停止，不做凭证、依赖或发布流程检查。
 1. 检查知乎 OpenAPI 凭证来源。
    - 先检查当前进程环境变量 `ZHIHU_OPENAPI_APP_KEY` / `ZHIHU_OPENAPI_APP_SECRET` 是否完整。
    - 再检查共享凭证文件 `~/.zhihu/openapi-credentials.json` 是否存在且包含完整凭证。

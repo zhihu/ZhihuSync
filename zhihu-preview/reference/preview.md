@@ -224,6 +224,6 @@
 
 - 预览只展示同一份结构化内容，不生成第二份标题或正文。
 - 生成完成后，按 `../SUBSKILL.md` 的「向用户交付预览」规则确认 `latest.html` 存在，并优先调用平台命令使用系统默认浏览器打开本地 HTML；不得使用 Cursor `open_resource` 打开源码来代替浏览器预览。只有系统浏览器无法打开时，才提供绝对路径的可点击 Markdown 文件链接作为降级入口，并等待用户明确确认。
-- 用户发现预览内容不对或要求修改内容时，先回到根 `zhihu-publisher`，结合用户需求和 `zhihu-validate` 的说明文档更新 `./.zhihu-publish-output/draft/latest-draft.md`，再重新运行 validate 和 preview。
+- 用户发现预览内容不对或要求修改内容时，先回到根 `zhihu-sync`，结合用户需求和 `zhihu-validate` 的说明文档更新 `./.zhihu-publish-output/draft/latest-draft.md`，再重新运行 validate 和 preview。
 - 不直接修改 `./.zhihu-publish-output/validate/latest.json` 或 `./.zhihu-publish-output/preview/latest.html` 来修正预览。
 - 用户确认预览前，不进入发布步骤。

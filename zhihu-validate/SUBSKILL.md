@@ -9,7 +9,7 @@ description: Convert ./.zhihu-publish-output/draft/latest-draft.md into Zhihu-re
 
 ## 使用时机
 
-当根 `zhihu-publisher` 已生成 draft，或用户要求将已有 draft 转换为供预览 / 发布使用的知乎结构化数据时使用本 skill。
+当根 `zhihu-sync` 已生成 draft，或用户要求将已有 draft 转换为供预览 / 发布使用的知乎结构化数据时使用本 skill。
 
 支持的内容形态：
 
@@ -27,9 +27,9 @@ description: Convert ./.zhihu-publish-output/draft/latest-draft.md into Zhihu-re
 
 读取规则：
 
-1. 该文件必须存在；不存在时停止并要求先执行根 `zhihu-publisher` 的 draft 阶段。
+1. 该文件必须存在；不存在时停止并要求先执行根 `zhihu-sync` 的 draft 阶段。
 2. 用户显式指定其他输入路径时，以用户指定路径为准。
-3. 不直接从对话上下文重新整理发布内容；对话中的新增修改、以及用户对预览结果的修正要求，都应先由根 `zhihu-publisher` 结合用户需求和本文参考文件更新 draft，再重新 validate。
+3. 不直接从对话上下文重新整理发布内容；对话中的新增修改、以及用户对预览结果的修正要求，都应先由根 `zhihu-sync` 结合用户需求和本文参考文件更新 draft，再重新 validate。
 
 ## 输出路径
 
@@ -60,7 +60,7 @@ description: Convert ./.zhihu-publish-output/draft/latest-draft.md into Zhihu-re
 2. 读取 `./.zhihu-publish-output/draft/latest-draft.md`，按 `reference/conversion.md` 的「转换前长度检查与用户决策」检查标题和正文。
    - 在任何内容转换或媒体上传前执行长度预检。
    - 发现超出当前内容形态的上限时，报告实际长度与上限，提供对应选项并停止，等待用户明确选择；不得生成时间戳结果，也不得覆盖已有 `latest.json`。
-   - 用户的选择和由此产生的精简内容、内容形态变更或拆分结果必须先由根 `zhihu-publisher` 写回 draft，再重新执行本步骤。
+   - 用户的选择和由此产生的精简内容、内容形态变更或拆分结果必须先由根 `zhihu-sync` 写回 draft，再重新执行本步骤。
 3. 按 `reference/conversion.md` 转换标题、正文和正文相关结构。
    - 严格执行 `reference/conversion.md` 的「内容保真与修改授权」规则。只做知乎发布所需的结构和格式适配，不得把转换、发布或预览请求视为润色授权。
    - 文章、提问生成 `title` 与 `body`。
@@ -118,7 +118,7 @@ description: Convert ./.zhihu-publish-output/draft/latest-draft.md into Zhihu-re
 ## 边界
 
 - 不生成本地浏览器预览 HTML；预览由 `zhihu-preview` 读取 `./.zhihu-publish-output/validate/latest.json` 后完成。
-- 不整理原始发布草稿；草稿由根 `zhihu-publisher` 写入 `./.zhihu-publish-output/draft/latest-draft.md`。
+- 不整理原始发布草稿；草稿由根 `zhihu-sync` 写入 `./.zhihu-publish-output/draft/latest-draft.md`。
 - 不发布内容。
 - 未经用户对具体动作和字段的明确允许，不得删减、精简、扩写、重排、合并、拆分或语义改写用户提供的内容。
 - 用户未提供或确认话题时，不得为想法自动生成话题。

@@ -1,6 +1,6 @@
 # Skill Update Check
 
-用于判断当前安装的 `zhihu-publisher` 是否落后于版本接口发布的版本，并在用户确认后更新。
+用于判断当前安装的 `zhihu-sync` / 知乎同步助手是否落后于版本接口发布的版本，并在用户确认后更新。
 
 ## 目录
 
@@ -14,7 +14,7 @@
 
 在以下场景读取本文档：
 
-- 每个会话首次加载 `zhihu-publisher` skill 后，自动检查一次。
+- 每个会话首次加载 `zhihu-sync` skill 后，自动检查一次。
 - 用户询问是否有新版本、要求检查版本、检查更新、更新或升级 skill。
 - 用户遇到明显像旧版本导致的问题，例如文档行为不一致、已修复问题仍复现、安装后能力缺失。
 
@@ -24,7 +24,7 @@
 
 本地版本和 skill 名称都读取当前 skill 根目录 `SKILL.md` frontmatter：
 
-- skill 名称：`name`，当前应为 `zhihu-publisher`。
+- skill 名称：`name`，当前应为 `zhihu-sync`。
 - 本地版本：`metadata.version`。
 - 任一字段不存在或版本格式不合法时，说明无法确定当前版本，不要使用 Git tag 或其他值补全。
 
@@ -40,8 +40,19 @@
 | 字段 | 含义 |
 |---|---|
 | `version` | 该 skill 的最新版本 |
-| `repository` | 首选更新方式使用的仓库标识，例如 `zhihu/zhihu-publisher` |
+| `repository` | 首选更新方式使用的外部仓库标识，例如 `zhihu/zhihu-sync` |
 | `download_link` | 备用更新方式使用的 ZIP 下载地址；可能为空 |
+
+### 更名兼容
+
+从 `zhihu-publisher` 更名为 `zhihu-sync` 后，版本接口同时保留两个顶层对象：
+
+- `zhihu-publisher`：供已安装的旧名称 skill 检查更新，作为迁移入口。
+- `zhihu-sync`：供当前 skill 检查更新。
+
+两个对象的 `version`、`repository` 和 `download_link` 保持一致，共同指向已发布的 `zhihu-sync` 新版。迁移版本号必须高于旧版 `0.1.11`（例如 `0.1.12`），仓库和 ZIP 中的 `SKILL.md` 必须声明 `name: zhihu-sync`，且 `metadata.version` 与接口版本一致。不要仅复制旧版 `0.1.11` 的对象值，否则旧用户无法发现更名升级。
+
+这是版本接口的兼容发布约定，不改变客户端的匹配规则：当前 skill 仍只读取 `zhihu-sync` 对象，不要求读取或比较旧名称对象。接口仅提供 `zhihu-publisher` 时，按下文“response 中没有同名对象”处理，不回退读取旧名称对象。
 
 ## 检查流程
 
@@ -68,7 +79,7 @@ curl.exe --fail --silent --show-error "$publishVersionBaseUrl/openapi/publish_sk
 Windows 必须显式调用 `curl.exe`，不要调用可能映射到 `Invoke-WebRequest` 的 PowerShell `curl` 别名。
 
 1. 结构化解析 response JSON，不要用字符串截取字段。
-2. 使用本地 `SKILL.md` 的 `name` 在顶层对象中做精确匹配；本 skill 只读取 `zhihu-publisher` 对象，不读取其他 skill 的版本。
+2. 使用本地 `SKILL.md` 的 `name` 在顶层对象中做精确匹配；当前本 skill 只读取 `zhihu-sync` 对象，不读取其他 skill 的版本，也不回退读取旧名称对象。
 3. 读取匹配对象的 `version`、`repository` 和 `download_link`；不要自行推导或替换这些值。
 4. 按语义化版本的数字顺序比较远端 `version` 与本地 `metadata.version` 的 `MAJOR.MINOR.PATCH`。
 
@@ -104,6 +115,8 @@ npx skills add {repository} -g
 
 将 `{repository}` 替换为接口返回的原始值。命令成功后，提示用户完全退出并重启 Agent；重启前不要继续发布流程。
 
+更名安装可能保留旧 `zhihu-publisher`。重启后首次加载 `zhihu-sync` 时，按根 `SKILL.md` 的“会话首次检查”中的“旧版本卸载”检查并提醒清理旧 skill；不要在更新过程中自动卸载旧 skill。
+
 ### 备用：download_link
 
 仅当 `repository` 为空、首选命令不可用或执行失败时使用：
@@ -114,13 +127,13 @@ npx skills add {repository} -g
 macOS / Linux：
 
 ```bash
-curl --fail --location --output zhihu-publisher-{version}.zip "{download_link}"
+curl --fail --location --output zhihu-sync-{version}.zip "{download_link}"
 ```
 
 Windows（PowerShell）：
 
 ```powershell
-curl.exe --fail --location --output "zhihu-publisher-{version}.zip" "{download_link}"
+curl.exe --fail --location --output "zhihu-sync-{version}.zip" "{download_link}"
 ```
 
 将 `{version}` 和 `{download_link}` 替换为同名对象返回的原始值。

@@ -120,7 +120,7 @@ description: >-
 - 系统默认浏览器打开成功后，不得再使用宿主内置浏览器、WebView 或浏览器控制工具打开同一预览；外部系统浏览器与宿主内置浏览器不得同时打开。
 - 只有记录了规定的平台命令不存在、原始退出状态非 0、命令异常、宿主明确没有用户桌面能力或用户拒绝授权中的至少一项可验证证据，才允许尝试宿主内置浏览器；没有证据时不得降级。只有内置浏览器也不可用、打开失败或用户拒绝所需授权时，才使用绝对路径 Markdown 链接作为最终降级入口。不得默认启动本地 HTTP 服务。
 - 降级到内置浏览器前，必须先向用户提示系统默认浏览器未能打开、实际失败原因以及即将改用内置浏览器；提示发送完成前不得调用内置浏览器。
-- 用户发现预览内容不对或要求修改内容时，应先回到根 `zhihu-publisher`，由根流程结合用户需求和 `zhihu-validate` 的说明文档更新 `./.zhihu-publish-output/draft/latest-draft.md`，再重新运行 validate 和 preview。
+- 用户发现预览内容不对或要求修改内容时，应先回到根 `zhihu-sync`，由根流程结合用户需求和 `zhihu-validate` 的说明文档更新 `./.zhihu-publish-output/draft/latest-draft.md`，再重新运行 validate 和 preview。
 - 不要直接修改 `./.zhihu-publish-output/validate/latest.json` 或 `./.zhihu-publish-output/preview/latest.html` 来修正预览。
 - 除非用户显式指定其他路径，产物应写入当前工作目录下的 `./.zhihu-publish-output/preview/`。
 
