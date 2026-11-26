@@ -19,10 +19,10 @@ Skill 本身提供格式适配、同步或发布能力，使用 Skill 不等于�
 
 发布到 Skill 注册中心后，可以使用注册中心提供的标识安装，例如：
 
-知乎同步助手的外部仓库标识为 `zhihu/zhihu-sync`。
+知乎同步助手的外部仓库标识为 `zhihu/zhihuSync`。
 
 ```bash
-npx skills add zhihu/zhihu-sync -g
+npx skills add zhihu/zhihuSync -g
 ```
 
 从旧版 `zhihu-publisher` 升级后，安装工具可能同时保留两个 skill。`zhihu-sync` 在每个会话首次加载时会检查旧 skill 是否仍可被当前 Agent 加载，发现共存时提醒你删除 `zhihu-publisher`、仅保留 `zhihu-sync`，并完全退出、重启 Agent。它不会自动删除旧 skill、共享凭证或发布产物。
